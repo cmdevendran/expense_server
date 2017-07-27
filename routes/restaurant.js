@@ -79,5 +79,40 @@ router.post('/restaurant/:id', function(req, res, next){
 });
 
 
-router.delete('/restaurant/:id')
+router.post('/restaurant/:id/:mcat', function(req, res, next){
+
+
+var vdeleteMenuCategory =  req.params.mcat;
+    console.log("insid delete id : "+req.params.id);
+     console.log("insid delete id category: "+ vdeleteMenuCategory);
+
+  //  console.log("insid menu category  : "+menuCategory.menuCat1.category);
+  if(!vdeleteMenuCategory){
+        res.status(400);
+        res.json({
+            "error": "Bad Data"
+        });
+    } else {
+      //db.getCollection('restaurants').update({"_id":ObjectId("596c31a3cd5b449992628cb1")}, {$pull:{"menucategory":{"categoryname":"Washers"}}})
+      db.restaurants.update({"_id" : mongojs.ObjectId(req.params.id)},{$pull:{"menucategory":{"categoryname":vdeleteMenuCategory}}}, function(err, restaurant){
+            if(err){
+                res.send(err);
+                console.log(err);
+            }
+            console.log("From Delete Restaurant menthod : "+restaurant);
+          //  db.getCollection('restaurants').find({"_id":ObjectId("596c31a3cd5b449992628cb1")}, {"menucategory.categoryname":1})
+          db.restaurants.findOne({"_id": mongojs.ObjectId(req.params.id)}, {"name":1, "menucategory":1}, function(err, restaurants){
+            // - dont need :db.restaurants.find({"staff.staffid": req.params.id, "staff.role":5}, {"menucategory.categoryname":1}, function(err, restaurants){
+              if(err){
+                res.send(err);
+              }
+              res.json(restaurants);
+            console.log("From Delete Restaurant menthod : "+restaurants);
+
+        });
+      });
+    }
+
+
+});
 module.exports = router;

@@ -8,6 +8,7 @@ var bodyParser = require('body-parser');
 
 var index = require('./routes/index');
 var restaurant = require('./routes/restaurant');
+var menuitem = require('./routes/menuitem');
 
 var port = 3001;
 
@@ -36,6 +37,8 @@ app.use(bodyParser.urlencoded({extended: false}));
 
 app.use('/', index);
 app.use('/api', restaurant);
+app.use('/menuitem', menuitem);
+
 /*
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);

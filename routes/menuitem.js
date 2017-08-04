@@ -1,9 +1,12 @@
 var express = require('express');
 var router = express.Router();
+var config = require('./../config');
 
 
 var mongojs = require('mongojs');
-var db = mongojs('mongodb://user:password@ds161262.mlab.com:61262/sgrestaurant', ['restaurants']);
+
+var db = mongojs(config.db);
+//var db = mongojs('mongodb://user:password@ds161262.mlab.com:61262/sgrestaurant', ['restaurants']);
 var ObjectID = mongojs.ObjectID;
 
 router.get('/menuitem', function(req, res, next) {

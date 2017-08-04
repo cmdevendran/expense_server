@@ -1,10 +1,15 @@
 var express = require('express');
 var router = express.Router();
-
-
 var mongojs = require('mongojs');
-var db = mongojs('mongodb://user:password@ds161262.mlab.com:61262/sgrestaurant', ['restaurants']);
+var config = require('./../config');
+
+
+//var db = mongojs('mongodb://user:password@ds161262.mlab.com:61262/sgrestaurant',['restaurants']);
+
+var db = mongojs(config.db);
 var ObjectID = mongojs.ObjectID;
+
+
 
 
 // Get All Tasks
@@ -43,6 +48,7 @@ router.get('/restaurant/:id', function(req, res, next) {
 //Add a new Restaurant
 router.post('/restaurant/', function(req, res, next) {
   //create a new object id
+    debugger;
   var vrestaurant = req.body;
   console.log("CREATING NEW RESTAURANT " + vrestaurant);
   //  console.log("insid menu category  : "+menuCategory.menuCat1.category);
@@ -54,11 +60,32 @@ router.post('/restaurant/', function(req, res, next) {
     });
   } else {
 
+var counter1;
+console.log("rc trigger : "+new Date().toString());
+
+db.RestaurantCounter.findAndModify({
+query: { "key":"Restaurant" },
+update: { $inc: {counter: 1} },
+new: true
+},
+    function(err, count) {
+      if (err) {
+        res.send(err);
+        console.log(err);
+      }
+      counter1 = count.counter;
+      console.log("Restaurant Counter " + counter1);
+
+
+    });
+
+console.log("rc ended : "+new Date().toString());
     //db.getCollection('restaurants').update({"_id":ObjectId("596c31a3cd5b449992628cb1")}, {$push:{"menucategory":{"categoryname":"Breakfast"}}})
     //db.restaurants.update({"_id" : mongojs.ObjectId('596c31a3cd5b449992628cb1')},{$addToSet:{"menucategory":{"categoryname":menuCategory.menuCat}}}, function(err, restaurant){
     db.restaurants.insert({
       "name": vrestaurant.name,
       "company_regno":vrestaurant.company_regno,
+      "restaurant_id" : counter1,
       "charge_gst":vrestaurant.charge_gst,
       "gstNo":vrestaurant.gstNo,
       "address":vrestaurant.address,
@@ -85,6 +112,7 @@ router.post('/restaurant/', function(req, res, next) {
       res.json(restaurant);
       console.log("Created Restaurant " + restaurant);
     });
+  //  console.log("rc insert complete : "+new Date().toString()+"         "+counter1);
   }
 
 

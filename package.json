@@ -16,6 +16,7 @@
     "express": "^4.15.3",
     "express-jwt":"^5.3.0",
     "body-parser":"1.17.2",
-    "jsonwebtoken":"^7.4.1"
+    "jsonwebtoken":"^7.4.1",
+    "morgon":"^1.8.2"
   }
 }

@@ -15,7 +15,7 @@ var restaurant = require('./routes/restaurant');
 var menuitem = require('./routes/menuitem');
 var authenticate = require('./routes/authenticate');
 
-var port = 3001;
+var port = 8080;
 
 var app = express();
 var morgan = require('morgan');

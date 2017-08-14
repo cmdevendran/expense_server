@@ -62,30 +62,55 @@ router.post('/restaurant/', function(req, res, next) {
 
 var counter1;
 console.log("rc trigger : "+new Date().toString());
+/**
+var request = require('request');
 
-db.RestaurantCounter.findAndModify({
+function getRequest(url) {
+return new Promise(function (success, failure) {
+request(url, function (error, response, body) {
+if (!error && response.statusCode == 200) {
+success(body);
+} else {
+failure(error);
+}
+});
+});
+}
+getRequest('https://httpbin.org/get').then(function (body1) {
+// do something with body1
+return getRequest('http://www.test.com/api2');
+});
+*/
+
+function getRequest() {
+return new Promise(function (success, failure) {db.RestaurantCounter.findAndModify({
 query: { "key":"Restaurant" },
 update: { $inc: {counter: 1} },
 new: true
 },
-    function(err, count) {
+    function(err, data) {
       if (err) {
         res.send(err);
         console.log(err);
       }
-      counter1 = count.counter;
-      console.log("Restaurant Counter " + counter1);
+      success(data)
+      counter1 = data.counter;
+      console.log("Restaurant Counter " + counter1 +"   ----   "+data.counter);
 
 
     });
+  });
+}
 
 console.log("rc ended : "+new Date().toString());
     //db.getCollection('restaurants').update({"_id":ObjectId("596c31a3cd5b449992628cb1")}, {$push:{"menucategory":{"categoryname":"Breakfast"}}})
     //db.restaurants.update({"_id" : mongojs.ObjectId('596c31a3cd5b449992628cb1')},{$addToSet:{"menucategory":{"categoryname":menuCategory.menuCat}}}, function(err, restaurant){
+getRequest().then(function (data) {
     db.restaurants.insert({
       "name": vrestaurant.name,
       "company_regno":vrestaurant.company_regno,
-      "restaurant_id" : counter1,
+      "restaurant_id" : data.counter,
+
       "charge_gst":vrestaurant.charge_gst,
       "gstNo":vrestaurant.gstNo,
       "address":vrestaurant.address,
@@ -112,6 +137,7 @@ console.log("rc ended : "+new Date().toString());
       res.json(restaurant);
       console.log("Created Restaurant " + restaurant);
     });
+  });
   //  console.log("rc insert complete : "+new Date().toString()+"         "+counter1);
   }
 

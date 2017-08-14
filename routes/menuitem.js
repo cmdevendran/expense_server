@@ -19,6 +19,39 @@ router.get('/menuitem', function(req, res, next) {
     console.log(restaurants);
   });
 });
+
+// serve MenuCategory to Users
+router.post('/servemenucat/:id', function(req, res, next){
+  db.restaurants.findOne({"_id" : mongojs.ObjectId(req.params.id)},{ "name":1,"menucategory":1, "menuitem":1},
+function(err, servemenu){
+  if(err){
+    res.sent(err);
+  }
+  res.json(servemenu);
+});
+});
+
+// serveMenuItem to users
+router.post('/servemenuitems/:id', function(req, res, next) {
+  var smenuitems = req.body;
+  //var menuitems = smenuitems.passme;
+  //console.log(menuitems.catid, menuitems.id);
+  db.restaurants.aggregate([{$match : {"_id" : mongojs.ObjectId(req.params.id)}},
+{$project:{
+    menuitem:{$filter:{
+        input: "$menuitem",
+        as : "item",
+        cond : {$eq: ["$$item.catid",smenuitems.catid]}}}}}], function(err, serveitems){
+    if(err){
+      res.sent(err);
+    }
+    res.json(serveitems);
+
+  });
+
+
+});
+
 //create menuItem
 
 router.post('/menuitem/:id', function(req, res, next) {

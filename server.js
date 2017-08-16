@@ -85,6 +85,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 
 app.use('/',index);
 app.use('/api', restaurant);
+app.use('/order', restaurant);
 app.use('/menuitem', menuitem);
 app.use('/authenticate',authenticate);
 

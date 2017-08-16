@@ -86,7 +86,9 @@ router.post('/menuitem/:id', function(req, res, next) {
           "lastmodifiedby": vmenuitem.lastmodifiedby,
           "currency": "SGD",
           "addgst" : vmenuitem.addgst,
+          "is_item_available" : vmenuitem.menu_is_available,
           "lastmodifieddate": isodate
+
         }
 
 

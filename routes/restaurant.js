@@ -242,12 +242,13 @@ router.post('/restaurant/:id/:mcat', function(req, res, next){
 
 //create menuItem
 
+
 router.post('/restaurant/menuitem/:id', function(req, res, next) {
     console.log("CREATING NEW menuItem " + vmenuitem);
   var objectId = new ObjectID();
   var vmenuitem = req.body;
   var menucategory = vmenuitem.menucategory;
-  var isodate = new Date().toISOString()
+  var isodate = new Date().toISOString();
 
   console.log("CREATING NEW menuItem " + vmenuitem);
   if (!vmenuitem) {
@@ -287,6 +288,98 @@ router.post('/restaurant/menuitem/:id', function(req, res, next) {
     });
   }
 
+
+
+
+});
+
+// Create new Order
+router.post('/order/neworder/:id',function(req, res, next){
+  var vorder = req.body;
+  console.log("CREATING NEW ORDER " + vorder);
+      var isodate = new Date().toISOString()
+      if (!vorder) {
+        res.status(400);
+        res.json({
+          "error": "Bad Data"
+        });
+      } else {
+
+        var counter1;
+        console.log("rc trigger : " + new Date().toString());
+
+        function getRequest() {
+          return new Promise(function(success, failure) {
+            db.RestaurantCounter.findAndModify({
+                query: {
+                  "key": req.params.id
+                },
+                update: {
+                  $inc: {
+                    counter: 1
+                  }
+                },
+                upsert: true,
+                new: true
+              },
+              function(err, data) {
+                if (err) {
+                  res.send(err);
+                  console.log(err);
+                }
+                success(data)
+                counter1 = data.counter;
+                console.log("Order Counter " + counter1 + "   ----   " + data.counter);
+
+
+              });
+          });
+        }
+
+        console.log("rc ended : " + new Date().toString());
+        //db.getCollection('restaurants').update({"_id":ObjectId("596c31a3cd5b449992628cb1")}, {$push:{"menucategory":{"categoryname":"Breakfast"}}})
+        //db.restaurants.update({"_id" : mongojs.ObjectId('596c31a3cd5b449992628cb1')},{$addToSet:{"menucategory":{"categoryname":menuCategory.menuCat}}}, function(err, restaurant){
+        getRequest().then(function(data) {
+          db.order.insert({
+            "name": vorder.name,
+            "restaurant_id": vorder.restaurant_id,
+            "order_number": counter1,
+            "order_status": vorder.status,
+            "total_amount": vorder.total_amount,
+            "OrderDetails": vorder.orderdetails,
+            "createdby": vorder.createdby,
+            "createddate": isodate,
+            "lastmodifiedby": vorder.lastmodifiedby,
+            "lastmodifieddate": isodate
+
+
+          }, function(err, restaurant) {
+            if (err) {
+              res.send(err);
+              console.log(err);
+            }
+            res.json(restaurant);
+            console.log("Created Restaurant " + restaurant);
+          });
+        });
+        //  console.log("rc insert complete : "+new Date().toString()+"         "+counter1);
+      }
+
+});
+
+// Retrieve user orders  id is userid
+router.post('/order/getmyorder/:id',function(req, res, next){
+
+
+  db.order.find({createdby:req.params.id}).sort({createddate:-1},
+    function(err, myorders) {
+      if (err) {
+        res.send(err);
+        console.log(err);
+      }
+      res.json(myorders);
+      console.log("User orders retrived " + myorders);
+    });
 
 
 

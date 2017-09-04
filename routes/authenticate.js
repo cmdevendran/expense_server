@@ -9,7 +9,7 @@ var db = mongojs(config.db);
 var app = express();
 app.set('superSecret', config.secret);
 
-
+/*
 router.post('/:id', function(req, res,next) {
 
   // find the user
@@ -59,6 +59,24 @@ if(auth){
     });
   }
 });
+*/
+// for Restaurant get rest id based on userid
+router.post('/rest/getuserrest/:id',function(req, res, next){
+  var id = req.params.id;
+  console.log("insid id : " + id);
+
+  if(id){
+  db.users.findOne({firebaseid:id},{restaurantid:1 },
+      function(err, restid) {
+        if (err) {
+          res.send(err);
+          console.log(err);
+        }
+        res.json(restid);
+        console.log("User order stopped " + restid);
+      });
+    }});
+
 
 
 module.exports = router;

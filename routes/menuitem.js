@@ -22,7 +22,8 @@ router.get('/menuitem', function(req, res, next) {
 
 // serve MenuCategory to Users
 router.post('/servemenucat/:id', function(req, res, next){
-  db.restaurants.findOne({"_id" : mongojs.ObjectId(req.params.id)},{ "name":1,"menucategory":1, "menuitem":1},
+//  db.restaurants.findOne({"_id" : mongojs.ObjectId(req.params.id)},{ "name":1,charg"menucategory":1, "menuitem":1},
+  db.restaurants.findOne({"_id" : mongojs.ObjectId(req.params.id)},{ "name":1, "charge_gst" : 1, "menucategory":1, "menuitem":1},
 function(err, servemenu){
   if(err){
     res.sent(err);

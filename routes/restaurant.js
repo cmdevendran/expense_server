@@ -47,99 +47,99 @@ router.get('/restaurant/:id', function(req, res, next) {
 
 //Add a new Restaurant
 router.post('/restaurant/', function(req, res, next) {
-  //create a new object id
-    debugger;
-  var vrestaurant = req.body;
-  console.log("CREATING NEW RESTAURANT " + vrestaurant);
-  //  console.log("insid menu category  : "+menuCategory.menuCat1.category);
-  var isodate = new Date().toISOString()
-  if (!vrestaurant) {
-    res.status(400);
-    res.json({
-      "error": "Bad Data"
-    });
-  } else {
+        //create a new object id
+          debugger;
+        var vrestaurant = req.body;
+        console.log("CREATING NEW RESTAURANT " + vrestaurant);
+        //  console.log("insid menu category  : "+menuCategory.menuCat1.category);
+        var isodate = new Date().toISOString()
+        if (!vrestaurant) {
+          res.status(400);
+          res.json({
+            "error": "Bad Data"
+          });
+        } else {
 
-var counter1;
-console.log("rc trigger : "+new Date().toString());
-/**
-var request = require('request');
+      var counter1;
+      console.log("rc trigger : "+new Date().toString());
+      /**
+      var request = require('request');
 
-function getRequest(url) {
-return new Promise(function (success, failure) {
-request(url, function (error, response, body) {
-if (!error && response.statusCode == 200) {
-success(body);
-} else {
-failure(error);
-}
-});
-});
-}
-getRequest('https://httpbin.org/get').then(function (body1) {
-// do something with body1
-return getRequest('http://www.test.com/api2');
-});
-*/
-
-function getRequest() {
-return new Promise(function (success, failure) {db.RestaurantCounter.findAndModify({
-query: { "key":"Restaurant" },
-update: { $inc: {counter: 1} },
-new: true
-},
-    function(err, data) {
-      if (err) {
-        res.send(err);
-        console.log(err);
+      function getRequest(url) {
+      return new Promise(function (success, failure) {
+      request(url, function (error, response, body) {
+      if (!error && response.statusCode == 200) {
+      success(body);
+      } else {
+      failure(error);
       }
-      success(data)
-      counter1 = data.counter;
-      console.log("Restaurant Counter " + counter1 +"   ----   "+data.counter);
-
-
-    });
-  });
-}
-
-console.log("rc ended : "+new Date().toString());
-    //db.getCollection('restaurants').update({"_id":ObjectId("596c31a3cd5b449992628cb1")}, {$push:{"menucategory":{"categoryname":"Breakfast"}}})
-    //db.restaurants.update({"_id" : mongojs.ObjectId('596c31a3cd5b449992628cb1')},{$addToSet:{"menucategory":{"categoryname":menuCategory.menuCat}}}, function(err, restaurant){
-getRequest().then(function (data) {
-    db.restaurants.insert({
-      "name": vrestaurant.name,
-      "company_regno":vrestaurant.company_regno,
-      "restaurant_id" : data.counter,
-
-      "charge_gst":vrestaurant.charge_gst,
-      "gstNo":vrestaurant.gstNo,
-      "address":vrestaurant.address,
-      "address2":vrestaurant.address2,
-      "block":vrestaurant.block,
-      "unit":vrestaurant.unit,
-      "website":vrestaurant.website,
-      "email":vrestaurant.email,
-      "phone":vrestaurant.phone,
-      "pincode":vrestaurant.pincode,
-      "state":vrestaurant.state,
-      "city":vrestaurant.city,
-      "country":vrestaurant.country,
-      "createdby":vrestaurant.createdby,
-      "createddate":isodate,
-      "lastmodifiedby":vrestaurant.lastmodifiedby,
-      "lastmodifieddate":isodate
-
-    }, function(err, restaurant) {
-      if (err) {
-        res.send(err);
-        console.log(err);
+      });
+      });
       }
-      res.json(restaurant);
-      console.log("Created Restaurant " + restaurant);
-    });
-  });
-  //  console.log("rc insert complete : "+new Date().toString()+"         "+counter1);
-  }
+      getRequest('https://httpbin.org/get').then(function (body1) {
+      // do something with body1
+      return getRequest('http://www.test.com/api2');
+      });
+      */
+
+      function getRequest() {
+      return new Promise(function (success, failure) {db.RestaurantCounter.findAndModify({
+      query: { "key":"Restaurant" },
+      update: { $inc: {counter: 1} },
+      new: true
+      },
+          function(err, data) {
+            if (err) {
+              res.send(err);
+              console.log(err);
+            }
+            success(data)
+            counter1 = data.counter;
+            console.log("Restaurant Counter " + counter1 +"   ----   "+data.counter);
+
+
+          });
+        });
+      }
+
+      console.log("rc ended : "+new Date().toString());
+          //db.getCollection('restaurants').update({"_id":ObjectId("596c31a3cd5b449992628cb1")}, {$push:{"menucategory":{"categoryname":"Breakfast"}}})
+          //db.restaurants.update({"_id" : mongojs.ObjectId('596c31a3cd5b449992628cb1')},{$addToSet:{"menucategory":{"categoryname":menuCategory.menuCat}}}, function(err, restaurant){
+      getRequest().then(function (data) {
+          db.restaurants.insert({
+            "name": vrestaurant.name,
+            "company_regno":vrestaurant.company_regno,
+            "restaurant_id" : data.counter,
+
+            "charge_gst":vrestaurant.charge_gst,
+            "gstNo":vrestaurant.gstNo,
+            "address":vrestaurant.address,
+            "address2":vrestaurant.address2,
+            "block":vrestaurant.block,
+            "unit":vrestaurant.unit,
+            "website":vrestaurant.website,
+            "email":vrestaurant.email,
+            "phone":vrestaurant.phone,
+            "pincode":vrestaurant.pincode,
+            "state":vrestaurant.state,
+            "city":vrestaurant.city,
+            "country":vrestaurant.country,
+            "createdby":vrestaurant.createdby,
+            "createddate":isodate,
+            "lastmodifiedby":vrestaurant.lastmodifiedby,
+            "lastmodifieddate":isodate
+
+          }, function(err, restaurant) {
+            if (err) {
+              res.send(err);
+              console.log(err);
+            }
+            res.json(restaurant);
+            console.log("Created Restaurant " + restaurant);
+          });
+        });
+        //  console.log("rc insert complete : "+new Date().toString()+"         "+counter1);
+        }
 
 
 });
@@ -367,7 +367,7 @@ router.post('/order/neworder/:id',function(req, res, next){
 
 });
 
-// Retrieve user orders  id is userid
+// Retrieve user orders == id is userid
 router.post('/order/getmyorder/:id',function(req, res, next){
 
 
@@ -384,4 +384,120 @@ router.post('/order/getmyorder/:id',function(req, res, next){
 
 
 });
+
+// Retrieve RESTAURANT Orders with has not paid -- here id is user id
+
+
+router.post('/order/getrestorder/:id',function(req, res, next){
+  var id = req.params.id;
+//  var uid = req.body;
+  console.log("get restaurant paid orders "+ id)
+  var restid;
+    function getRequest() {
+      return new Promise(function(success, failure) {
+        db.users.findOne({firebaseid:id},{restaurantid:1 },
+          function(err, data) {
+            if (err) {
+              res.send(err);
+              console.log(err);
+            }
+            success(data)
+            restid = data.restaurantid;
+            console.log("restid " +  restid);
+
+
+          });
+      });
+    }
+
+    getRequest().then(function(data) {
+      console.log("within getre "+ restid);
+      db.order.find({ "order_status": { $ne: "paid" },  "restaurant_id": data.restaurantid }).sort({createddate:-1},
+    //  db.order.find({restaurant_id:data.restaurantid},
+      function(err, restaurant) {
+        if (err) {
+          res.send(err);
+          console.log(err);
+        }
+        res.json(restaurant);
+        console.log("restaurant orders " + restaurant);
+      });
+    });
+    /**
+  db.order.find({ order_status: { $ne: "paid" },  restaurant_id:req.params.id},
+    function(err,restorder) {
+      if (err) {
+        res.send(err);
+        console.log(err);
+      }
+      res.json(restorder);
+      console.log("Restaurant order retrieve " + restorder);
+    });*/
+});
+// Retrieve  ALL RESTAURANT Orders for cashiers-- here id is rest id
+router.post('/order/getallrestorder/:id',function(req, res, next){
+  var uid =
+  db.order.find({ restaurant_id:req.params.id},
+    function(err,restorder) {
+      if (err) {
+        res.send(err);
+        console.log(err);
+      }
+      res.json(restorder);
+      console.log("Restaurant all orders retrieve " + restorder);
+    });
+});
+
+
+// User shall stop the order, for restaurant people to ammend the order or cancel it, stop will not work if the status is not ordered
+
+router.post('/order/stoporder/:id',function(req, res, next){
+  console.log("insid id : " + req.params.id);
+
+  if(req.params.id){
+    db.order.update(
+     { _id: mongojs.ObjectId(req.params.id), "order_status":"ordered"},
+     { $set: { "order_status": "hold" } },
+      function(err, stoporder) {
+        if (err) {
+          res.send(err);
+          console.log(err);
+        }
+        res.json(stoporder);
+        console.log("User order stopped " + stoporder);
+      });
+  }
+
+
+});
+
+// Restaurant - acceptPayment - id is orderid
+
+router.post('/order/acceptPayment/:id',function(req, res, next){
+  console.log("accept Payment : " + req.params.id);
+  var body = req.body;
+  var isodate = new Date().toISOString()
+  if(req.params.id){
+    db.order.update(
+     { _id: mongojs.ObjectId(body._id),"order_status": { $ne: "paid" } },
+     { $set: { "order_status": "paid",
+                "paid_time" : isodate,
+                "lastmodifiedby" : body.uid,
+              "lastmodifieddate" : isodate,
+            "amount_paid" : body.amount_paid,
+          "amount_tendered" : body.amount_tendered }},
+      function(err, acceptorder) {
+        if (err) {
+          res.send(err);
+          console.log(err);
+        }
+        res.json(acceptorder);
+        console.log("User accept payment " + acceptorder);
+      });
+  }
+
+
+});
+
+
 module.exports = router;

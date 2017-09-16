@@ -20,7 +20,8 @@ router.get('/menuitem', function(req, res, next) {
   });
 });
 
-// serve MenuCategory to Users
+// serve MenuCategory to Users - id is restaurant id
+
 router.post('/servemenucat/:id', function(req, res, next){
 //  db.restaurants.findOne({"_id" : mongojs.ObjectId(req.params.id)},{ "name":1,charg"menucategory":1, "menuitem":1},
   db.restaurants.findOne({"_id" : mongojs.ObjectId(req.params.id)},{ "name":1, "charge_gst" : 1, "menucategory":1, "menuitem":1},
@@ -31,6 +32,21 @@ function(err, servemenu){
   res.json(servemenu);
 });
 });
+
+// used to get the restaurant data .. id is restaurant_id e.g 1001
+router.post('/serverest/:id', function(req, res, next){
+  var myid = req.body.id;
+  console.log("myid"+myid);
+//  db.restaurants.findOne({"_id" : mongojs.ObjectId(req.params.id)},{ "name":1,charg"menucategory":1, "menuitem":1},
+  db.restaurants.findOne({"restaurant_id":parseInt(req.params.id)},{"staff":0,"lastmodifiedby" : 0, "lastmodifieddate":0, "createddate":0,"createdby":0},
+function(err, servemenu){
+  if(err){
+    res.sent(err);
+  }
+  res.json(servemenu);
+});
+});
+
 
 // serveMenuItem to users
 router.post('/servemenuitems/:id', function(req, res, next) {

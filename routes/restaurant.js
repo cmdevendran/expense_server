@@ -110,7 +110,8 @@ router.post('/restaurant/', function(req, res, next) {
             "name": vrestaurant.name,
             "company_regno":vrestaurant.company_regno,
             "restaurant_id" : data.counter,
-
+            "is_active" : "true",
+                        
             "charge_gst":vrestaurant.charge_gst,
             "gstNo":vrestaurant.gstNo,
             "address":vrestaurant.address,
@@ -434,21 +435,53 @@ router.post('/order/getrestorder/:id',function(req, res, next){
       console.log("Restaurant order retrieve " + restorder);
     });*/
 });
-// Retrieve  ALL RESTAURANT Orders for cashiers-- here id is rest id
+// Retrieve  ALL RESTAURANT Orders for cashiers-- here id is UID id
 router.post('/order/getallrestorder/:id',function(req, res, next){
-  var uid =
-  db.order.find({ restaurant_id:req.params.id},
+  var id = req.params.id;
+//  var uid = req.body;
+  console.log("get restaurant paid orders "+ id)
+  var restid;
+    function getRequest() {
+      return new Promise(function(success, failure) {
+        db.users.findOne({firebaseid:id},{restaurantid:1 },
+          function(err, data) {
+            if (err) {
+              res.send(err);
+              console.log(err);
+            }
+            success(data)
+            restid = data.restaurantid;
+            console.log("restid " +  restid);
+
+
+          });
+      });
+    }
+
+    getRequest().then(function(data) {
+      console.log("within getre "+ restid);
+      db.order.find({ "restaurant_id": data.restaurantid }).sort({createddate:-1},
+    //  db.order.find({restaurant_id:data.restaurantid},
+      function(err, restaurant) {
+        if (err) {
+          res.send(err);
+          console.log(err);
+        }
+        res.json(restaurant);
+        console.log("restaurant orders " + restaurant);
+      });
+    });
+    /**
+  db.order.find({ order_status: { $ne: "paid" },  restaurant_id:req.params.id},
     function(err,restorder) {
       if (err) {
         res.send(err);
         console.log(err);
       }
       res.json(restorder);
-      console.log("Restaurant all orders retrieve " + restorder);
-    });
+      console.log("Restaurant order retrieve " + restorder);
+    });*/
 });
-
-
 // User shall stop the order, for restaurant people to ammend the order or cancel it, stop will not work if the status is not ordered
 
 router.post('/order/stoporder/:id',function(req, res, next){

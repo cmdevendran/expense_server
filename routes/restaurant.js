@@ -45,6 +45,27 @@ router.get('/restaurant/:id', function(req, res, next) {
 
 });
 
+// get menus for restuarant - used in rest admin app
+router.post('/restaurant/getrest/:id', function(req, res, next) {
+  //db.restaurants.findOne({"staff.staffid":"HMxFSQyw2QcXkRbCju1R0DLJA6x2", "staff.role":5})
+  console.log("id : " + req.params.id);
+  db.restaurants.findOne({
+    "staff.staffid": req.params.id,
+    "staff.role": 5
+  }, {
+    "name": 1,
+    "menucategory": 1,
+    "menuitem":1
+  }, function(err, restaurants) {
+    if (err) {
+      res.send(err);
+    }
+    res.json(restaurants);
+    console.log("From get Restaurant menthod : "+restaurants);
+  });
+
+});
+
 //Add a new Restaurant
 router.post('/restaurant/', function(req, res, next) {
         //create a new object id
@@ -110,8 +131,9 @@ router.post('/restaurant/', function(req, res, next) {
             "name": vrestaurant.name,
             "company_regno":vrestaurant.company_regno,
             "restaurant_id" : data.counter,
-            "is_active" : "true",
-                        
+            "is_active" : false,
+            "suspend": false,
+
             "charge_gst":vrestaurant.charge_gst,
             "gstNo":vrestaurant.gstNo,
             "address":vrestaurant.address,

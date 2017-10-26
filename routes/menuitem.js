@@ -53,12 +53,17 @@ router.post('/servemenuitems/:id', function(req, res, next) {
   var smenuitems = req.body;
   //var menuitems = smenuitems.passme;
   //console.log(menuitems.catid, menuitems.id);
+
+//this query will retrieve only available menuitems. To get all use the commented query
   db.restaurants.aggregate([{$match : {"_id" : mongojs.ObjectId(req.params.id)}},
 {$project:{
     menuitem:{$filter:{
         input: "$menuitem",
         as : "item",
-        cond : {$eq: ["$$item.catid",smenuitems.catid]}}}}}], function(err, serveitems){
+      //!use to retrieve all menuitems  cond : {$eq: ["$$item.catid",smenuitems.catid]}}}}}], function(err, serveitems){
+      cond : {$and : [
+            {$eq: ["$$item.catid",smenuitems.catid]},
+            {$eq:["$$item.is_item_available",true]}]}}}}}], function(err, serveitems){
     if(err){
       res.sent(err);
     }

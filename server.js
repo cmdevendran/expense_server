@@ -15,10 +15,15 @@ var restaurant = require('./routes/restaurant');
 var menuitem = require('./routes/menuitem');
 var authenticate = require('./routes/authenticate');
 
-var port = 5000;
+//var port = 8080;
 
 var app = express();
 var morgan = require('morgan');
+
+	
+//After lots of googling I decided to npm install express and add
+
+app.set('port', (process.env.PORT || 5000));
 
 morgan.token('date', function() {
     var p = new Date().toString().replace(/[A-Z]{3}\+/,'+').split(/ /);
@@ -101,7 +106,7 @@ server.listen(port, function(){
 });*/
 
 
-app.listen(port,function(){
+app.listen(app.get('port'),function(){
     console.log('Server started on port '+port);
 });
 

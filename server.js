@@ -1,8 +1,12 @@
+// Server.js is the entry point for the app
+
 var express = require('express');
 var jwt    = require('jsonwebtoken'); // used to create, sign, and verify tokens
 var config = require('./config'); // get our config file
 var mongojs = require('mongojs');
 var ejwt = require('express-jwt');
+var aws = require('aws-sdk');
+
 
 
 
@@ -14,6 +18,7 @@ var index = require('./routes/index');
 var restaurant = require('./routes/restaurant');
 var menuitem = require('./routes/menuitem');
 var authenticate = require('./routes/authenticate');
+//var sign = require('.routes/sign')
 
 //var port = 8080;
 
@@ -104,6 +109,32 @@ io.on('connection', function(){ /* … */ /*});
 server.listen(port, function(){
     console.log('Server started on port '+port);
 });*/
+
+var AWS_ACCESS_KEY = config.AWSAccessKeyId;
+var AWS_SECRET_KEY = config.AWSSecretKey;
+var S3_BUCKET = config.storage;
+
+app.get('/sign', function(req, res) {
+  aws.config.update({accessKeyId: AWS_ACCESS_KEY, secretAccessKey: AWS_SECRET_KEY});
+
+  var s3 = new aws.S3()
+  var options = {
+    Bucket: S3_BUCKET,
+    Key: req.query.file_name,
+    Expires: 60,
+    ContentType: req.query.file_type,
+    ACL: 'public-read'
+  }
+
+  s3.getSignedUrl('putObject', options, function(err, data){
+    if(err) return res.send('Error with S3')
+
+    res.json({
+      signed_request: data,
+      url: 'https://s3.amazonaws.com/' + S3_BUCKET + '/' + req.query.file_name
+    })
+  })
+});
 
 
 app.listen(app.get('port'),function(){

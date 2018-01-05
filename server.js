@@ -13,8 +13,7 @@ var bodyParser = require('body-parser');
 // test
 
 var index = require('./routes/index');
-var restaurant = require('./routes/restaurant');
-var menuitem = require('./routes/menuitem');
+var expense = require('./routes/expense');
 var authenticate = require('./routes/authenticate');
 
 //var port = 8080;
@@ -25,7 +24,7 @@ var morgan = require('morgan');
 	
 //After lots of googling I decided to npm install express and add
 
-app.set('port', (process.env.PORT || 5000));
+app.set('port', (process.env.PORT || 6000));
 
 morgan.token('date', function() {
     var p = new Date().toString().replace(/[A-Z]{3}\+/,'+').split(/ /);
@@ -106,9 +105,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 
 
 app.use('/',index);
-app.use('/api', restaurant);
-app.use('/order', restaurant);
-app.use('/menuitem', menuitem);
+app.use('/expense', expense);
 app.use('/authenticate',authenticate);
 
 //app.use('/api',router);

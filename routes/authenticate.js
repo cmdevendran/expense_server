@@ -16,57 +16,6 @@ app.set('superSecret', config.secret);
 
 
 
-/*
-router.post('/:id', function(req, res,next) {
-
-  // find the user
-  db.users.findOne({"firebaseid":req.params.id, "active" : true, "blocked" : false},{"firebaseid":1}, function(err, user) {
-
-    if (err) throw err;
-
-    if (!user) {
-      res.json({ success: false, message: 'Authentication failed. User not found.' });
-    } else if (user) {
-
-      // check if password matches
-      // if user is found and password is right
-      // create a token
-        var token = jwt.sign(user,  app.get('superSecret'), {
-          expiresIn: "30d" // expires in 24 hours
-        });
-        res.setHeader("Content-Type", "application/json");
-        res.setHeader("Authentication", token);
-
-        // return the information including token as JSON
-        res.json({
-          success: true,
-          message: 'token',
-          token: token
-        });
-      }
-
-
-
-  });
-});
-
-router.get('/', function(req, res, next){
-var auth =  req.get('Authentication');
-console.log(auth);
-if(auth){
-  jwt.verify(auth, app.get('superSecret'), function(err, decoded) {
-      if (err) {
-        return res.json({ success: false, message: 'Failed to authenticate token.' });
-      } else {
-        // if everything is good, save to request for use in other routes
-        req.decoded = decoded;
-        res.json({decoded});
-        //next();
-      }
-    });
-  }
-});
-*/
 // for Restaurant get rest id based on userid
 router.post('/rest/getuserrest/:id',function(req, res, next){
   var id = req.params.id;
@@ -84,6 +33,7 @@ router.post('/rest/getuserrest/:id',function(req, res, next){
       });
     }});
 
+  // Register user
   router.post('/rest/userregister', function(req, res) {
     console.log("within user-register mongodb");
     /*
@@ -92,10 +42,13 @@ router.post('/rest/getuserrest/:id',function(req, res, next){
     });*/
     var username = req.body.username;
     var password = req.body.password;
+    var FirstName = req.body.firstname;
+    var LastName = req.body.lastname;
+
     var hashpassword = bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
   
    // new_user.password = new_user.generateHash(userInfo.password);
-    db.user.insert({username : username, password : hashpassword}, function(err, user){
+    db.user.insert({username : username, lastname : LastName, firstname : FirstName,password : hashpassword}, function(err, user){
       if(err){
         console.log(err);
         return res.status(500).send();

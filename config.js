@@ -5,8 +5,9 @@ module.exports = {
   "typ": "JWT"
 },
     'secret': 'sgrestaurant@1234S',
-    'db' : 'mongodb://user:password@ds161262.mlab.com:61262/sgrestaurant', 
+    'db' : 'mongodb://expense_admin:deva%401234D@ds125906.mlab.com:25906/expense_tracker', 
     'env': 'DEV'
+   
 // PROD for production environment
 // DEV for dev environment
 };

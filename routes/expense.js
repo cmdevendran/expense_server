@@ -35,7 +35,7 @@ router.post('/getcat/', function(req, res, next) {
     db.expense_entries.insert({
         "expcat" : req.body.expcat,
         "expdate" : isodate,
-        "expamount" : req.body.amount,
+        "expamount" : req.body.expamount,
         "expremark" : req.body.expremark
         
         },function(err, data) {

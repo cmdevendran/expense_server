@@ -24,7 +24,7 @@ var morgan = require('morgan');
 	//Access-Control-Allow-Headers
 //After lots of googling I decided to npm install express and add
 
-app.set('port', (process.env.PORT || 8080));
+app.set('port', (process.env.PORT || 6000));
 
 morgan.token('date', function() {
     var p = new Date().toString().replace(/[A-Z]{3}\+/,'+').split(/ /);

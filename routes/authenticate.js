@@ -6,7 +6,8 @@ var jwt    = require('jsonwebtoken');
 //var User = require('./user');
 var bcrypt = require('bcrypt-nodejs');
 //var db = mongojs('mongodb://user:password@ds161262.mlab.com:61262/sgrestaurant', ['restaurants']);
-
+var session = require('express-session');
+var MongoStore = require('connect-mongo')(session)
 var db = mongojs(config.db);
 var schema = mongojs.schema;
 var bcrypt = require('bcrypt-nodejs');
@@ -16,22 +17,7 @@ app.set('superSecret', config.secret);
 
 
 
-// for Restaurant get rest id based on userid
-router.post('/rest/getuserrest/:id',function(req, res, next){
-  var id = req.params.id;
-  console.log("insid id : " + id);
 
-  if(id){
-  db.users.findOne({firebaseid:id},{restaurantid:1 },
-      function(err, restid) {
-        if (err) {
-          res.send(err);
-          console.log(err);
-        }
-        res.json(restid);
-        console.log("User order stopped " + restid);
-      });
-    }});
 
   // Register user
   router.post('/rest/userregister', function(req, res) {
@@ -72,6 +58,8 @@ router.post('/rest/getuserrest/:id',function(req, res, next){
   }
 //
 
+
+// check login information
 router.post('/rest/profile', requiresLogin, function(req, res, next) {
   //...
 
@@ -92,9 +80,9 @@ router.post('/rest/profile', requiresLogin, function(req, res, next) {
   });
 
   
+// Login to Mongodb
 
-
-  router.post('/rest/login', function(req, res) {
+  router.post('/rest/login',  function(req, res,next) {
     var credentials = req.body;
     console.log(credentials);
     var username = req.body.username;
@@ -111,10 +99,10 @@ router.post('/rest/profile', requiresLogin, function(req, res, next) {
         console.log(err);
         return res.status(500).send();
       }
-      console.log("wrong user : "+JSON.stringify(user));
+      console.log("before  user : "+JSON.stringify(user));
       if (user) {
-        console.log(JSON.stringify(user));
-        console.log(JSON.stringify(user.password));
+        console.log("user: "+JSON.stringify(user));
+        console.log("user password : "+JSON.stringify(user.password));
         bcrypt.compare(password, user.password, function(err, data) {
           if(err){
             console.log(err);
@@ -124,8 +112,9 @@ router.post('/rest/profile', requiresLogin, function(req, res, next) {
             req.session.userId = user._id;
            // return res.redirect('/profile');
 
-            console.log(data);
-            return res.status(200).send(user._id);
+            console.log("user data : "+ data);
+           // res.json(data);
+           return res.status(200).send(user._id);
           }
           console.log(data);
           return res.status(404).send("password does not match");

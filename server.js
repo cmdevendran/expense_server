@@ -21,10 +21,10 @@ var authenticate = require('./routes/authenticate');
 var app = express();
 var morgan = require('morgan');
 
-	
+	//Access-Control-Allow-Headers
 //After lots of googling I decided to npm install express and add
 
-app.set('port', (process.env.PORT || 6000));
+app.set('port', (process.env.PORT || 8080));
 
 morgan.token('date', function() {
     var p = new Date().toString().replace(/[A-Z]{3}\+/,'+').split(/ /);
@@ -32,7 +32,7 @@ morgan.token('date', function() {
 });
 app.use(morgan('combined'));
 
-var db = mongojs(config.db,['restaurants']); // connect to database
+var db = mongojs(config.db,['expense_tracker']); // connect to database
 app.set('superSecret', config.secret); // secret variable
 //app.unless(jwt({secret:config.secret}).unless({path:['/api','/']}))  ;
 var sess = {
@@ -76,9 +76,11 @@ app.use("/", ejwt({
 
 
 app.use(function(err, req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+ // res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, session, X-Requested-With, Content-Type, Accept, Authorization");
 res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+
+
 
 if (err.name === 'UnauthorizedError') {
   return res.status(403).send({

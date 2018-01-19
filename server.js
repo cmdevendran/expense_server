@@ -24,7 +24,7 @@ var morgan = require('morgan');
 	//Access-Control-Allow-Headers
 //After lots of googling I decided to npm install express and add
 
-app.set('port', (process.env.PORT || 6000));
+app.set('port', (process.env.PORT || 8080));
 
 morgan.token('date', function() {
     var p = new Date().toString().replace(/[A-Z]{3}\+/,'+').split(/ /);
@@ -76,7 +76,7 @@ app.use("/", ejwt({
 
 
 app.use(function(err, req, res, next) {
- // res.header("Access-Control-Allow-Origin", "*");
+ res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, session, X-Requested-With, Content-Type, Accept, Authorization");
 res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
 

@@ -33,7 +33,7 @@ function verfiyAuth(req, res, next) {
     next();
   }
 }
-
+// USED to check the session is active or not. if session not available then most of things should not proceed.
 function verifySession(req, res, next) {
   console.log(JSON.stringify(req.headers));
   console.log(" req login 1: " + req.headers.session);
@@ -97,6 +97,7 @@ router.post('/postexp/',verifySession, function (req, res, next) {
   db.expense_entries.insert({
     "expcat": req.body.expcat,
     "expdate": isodate,
+    "userid":req.headers.session ,
     // "expamount" : req.body.expamount,
     // "expamount" : parseFloat(expamount),
     "expamount": Number(expamount),

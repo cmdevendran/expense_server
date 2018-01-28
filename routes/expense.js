@@ -24,6 +24,31 @@ router.post('/getcat/', verifySession, function (req, res, next) {
 
 });
 
+// returns the expenses
+router.post('/getexpenses/', verifySession, function (req, res, next) {
+  console.log("within Expenses called");
+  console.log(req.body);
+//  console.log(req.body.credential.startDate);
+  startDate = req.body.startDate;
+  endDate = req.body.endDate;
+  console.log( "in get expenses : "+ startDate +" "+endDate);
+
+  db.expense_entries.find({'userid':req.headers.session, 'expdate' :{
+    '$gte' : (new Date(startDate).toISOString()),
+       '$lt' :  (new Date(endDate).toISOString())
+    }
+    },
+    function (err, restaurants) {
+      if (err) {
+        res.send(err);
+      }
+      res.json(restaurants);
+      console.log("From get Restaurant menthod : " + restaurants);
+    });
+
+
+});
+
 function verfiyAuth(req, res, next) {
   console.log("Witin VerifyAuth " + JSON.stringify(req.headers));
   if (req.get('session')) {

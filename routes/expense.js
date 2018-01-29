@@ -31,13 +31,15 @@ router.post('/getexpenses/', verifySession, function (req, res, next) {
 //  console.log(req.body.credential.startDate);
   startDate = req.body.startDate;
   endDate = req.body.endDate;
+  session = req.headers.session;
+
   console.log( "in get expenses : "+ startDate +" "+endDate);
 
-  db.expense_entries.find({'userid':req.headers.session, 'expdate' :{
+  db.expense_entries.find({'userid':session, 'expdate' :{
     '$gte' : (new Date(startDate).toISOString()),
        '$lt' :  (new Date(endDate).toISOString())
     }
-    },
+    }).sort({_id:-1} ,
     function (err, restaurants) {
       if (err) {
         res.send(err);

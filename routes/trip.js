@@ -80,7 +80,9 @@ router.post('/getrecenttrips/', verifySession, function (req, res, next) {
   var session = req.headers.session;
   console.log("within trips.." + session)
 
-  db.trips.find({ 'userid': session }).limit(10).sort({ _id: -1 }, function (err, data) {
+  // returns the set with the sort date latest as the first records
+
+  db.trips.find({ 'userid': session }).limit(10).sort({tripdate:-1}, function (err, data) {
     if (err) {
       res.send(err);
     }

@@ -39,7 +39,7 @@ router.post('/getexpenses/', verifySession, function (req, res, next) {
     '$gte' : (new Date(startDate).toISOString()),
        '$lt' :  (new Date(endDate).toISOString())
     }
-    }).sort({_id:-1} ,
+    }).sort({expdate:-1} ,
     function (err, restaurants) {
       if (err) {
         res.send(err);

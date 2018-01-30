@@ -15,6 +15,7 @@ var bodyParser = require('body-parser');
 var index = require('./routes/index');
 var expense = require('./routes/expense');
 var authenticate = require('./routes/authenticate');
+var trip = require('./routes/trip');
 
 //var port = 8080;
 
@@ -108,6 +109,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 
 app.use('/',index);
 app.use('/expense', expense);
+app.use('/trip', trip);
 app.use('/authenticate',authenticate);
 
 //app.use('/api',router);

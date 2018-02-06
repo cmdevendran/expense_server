@@ -30,18 +30,44 @@ app.set('superSecret', config.secret);
     var password = req.body.password;
     var FirstName = req.body.firstname;
     var LastName = req.body.lastname;
+    console.log("username : "+req.body.username);
+    console.log("password : "+req.body.password);
 
     var hashpassword = bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
+
+    db.user.findOne({username: username}, function(err, user) {
+      if(err){
+        console.log(err);
+        return res.status(500).send();
+      }
+     // console.log("before  user : "+JSON.stringify(user));
+      if (user) {
+        return res.status(404).send("User Already Exist");
+               
+      } else{
+
+        db.user.insert({username : req.body.username,password : hashpassword}, function(err, data){
+          if(err){
+            console.log(err);
+            return res.status(500).send("User Registration Error");
+          }
+          return res.status(200).send("User registered successfully"+ data);
+    
+        })
+      }
+
+    
+    });
   
    // new_user.password = new_user.generateHash(userInfo.password);
-    db.user.insert({username : username, lastname : LastName, firstname : FirstName,password : hashpassword}, function(err, user){
+/*     db.user.insert({username : username, lastname : LastName, firstname : FirstName,password : hashpassword}, function(err, user){
       if(err){
         console.log(err);
         return res.status(500).send();
       }
       return res.status(200).send();
 
-    });
+    }); */
   });
 
   

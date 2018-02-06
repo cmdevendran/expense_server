@@ -1,3 +1,5 @@
+
+
 var express = require('express');
 var router = express.Router();
 var mongojs = require('mongojs');
@@ -33,20 +35,70 @@ router.post('/getexpenses/', verifySession, function (req, res, next) {
   endDate = req.body.endDate;
   session = req.headers.session;
 
+
+
   console.log( "in get expenses : "+ startDate +" "+endDate);
 
-  db.expense_entries.find({'userid':session, 'expdate' :{
-    '$gte' : (new Date(startDate).toISOString()),
-       '$lt' :  (new Date(endDate).toISOString())
-    }
-    }).sort({expdate:-1} ,
-    function (err, restaurants) {
-      if (err) {
-        res.send(err);
+  if(!startDate && !endDate) {
+      console.log("No start and end date");
+
+      db.expense_entries.find({'userid':session
+        }).limit(10).sort({expdate:-1} ,
+        function (err, restaurants) {
+          if (err) {
+            res.send(err);
+          }
+          res.json(restaurants);
+          console.log("From get Restaurant menthod : " + restaurants);
+        });
+  } else if(!startDate){
+    console.log("only start date");
+    db.expense_entries.find({'userid':session, 'expdate' :{
+      
+         '$lt' :  (new Date(endDate).toISOString())
       }
-      res.json(restaurants);
-      console.log("From get Restaurant menthod : " + restaurants);
-    });
+      }).sort({expdate:-1} ,
+      function (err, restaurants) {
+        if (err) {
+          res.send(err);
+        }
+        res.json(restaurants);
+        console.log("From get Restaurant menthod : " + restaurants);
+      });
+
+  }else if(!endDate){
+    console.log("only end date");
+    db.expense_entries.find({'userid':session, 'expdate' :{
+      '$gte' : (new Date(startDate).toISOString())
+         
+      }
+      }).sort({expdate:-1} ,
+      function (err, restaurants) {
+        if (err) {
+          res.send(err);
+        }
+        res.json(restaurants);
+        console.log("From get Restaurant menthod : " + restaurants);
+      });
+
+  }else{
+    console.log("have both date");
+    db.expense_entries.find({'userid':session, 'expdate' :{
+      '$gte' : (new Date(startDate).toISOString()),
+         '$lt' :  (new Date(endDate).toISOString())
+      }
+      }).sort({expdate:-1} ,
+      function (err, restaurants) {
+        if (err) {
+          res.send(err);
+        }
+        res.json(restaurants);
+        console.log("From get Restaurant menthod : " + restaurants);
+      });
+   }
+
+
+
 
 
 });

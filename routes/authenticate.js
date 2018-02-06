@@ -51,7 +51,9 @@ app.set('superSecret', config.secret);
             console.log(err);
             return res.status(500).send("User Registration Error");
           }
-          return res.status(200).send("User registered successfully"+ data);
+         // return res.status(200).send("User registered successfully"+ data);
+         console.log(JSON.stringify(data));
+         return res.status(200).send(data);
     
         })
       }

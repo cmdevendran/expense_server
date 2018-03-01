@@ -55,7 +55,7 @@ router.post('/getexpenses/', verifySession, function (req, res, next) {
     console.log("only start date");
     db.expense_entries.find({'userid':session, 'expdate' :{
       
-         '$lt' :  (new Date(endDate).toISOString())
+         '$lte' :  (new Date(endDate).toISOString())
       }
       }).sort({expdate:-1} ,
       function (err, restaurants) {
@@ -85,7 +85,7 @@ router.post('/getexpenses/', verifySession, function (req, res, next) {
     console.log("have both date");
     db.expense_entries.find({'userid':session, 'expdate' :{
       '$gte' : (new Date(startDate).toISOString()),
-         '$lt' :  (new Date(endDate).toISOString())
+         '$lte' :  (new Date(endDate).toISOString())
       }
       }).sort({expdate:-1} ,
       function (err, restaurants) {

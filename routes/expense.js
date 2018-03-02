@@ -197,4 +197,32 @@ router.post('/postexp/',verifySession, function (req, res, next) {
 
 });
 
+
+  /***
+   * 
+   *  Delete Expense
+   * 
+   * 
+   */
+
+  router.post('/deleteexp/', verifySession, function (req, res, next) {
+
+    var session = req.headers.session;
+    console.log("within expenses.." + session)
+
+    db.expense_entries.remove({
+      "_id": mongojs.ObjectId(req.body._id)
+    }, function (err, data) {
+      if (err) {
+        res.send(err);
+      }
+      res.json(data);
+
+    });
+
+
+
+
+  });
+
 module.exports = router;

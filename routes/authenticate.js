@@ -4,13 +4,13 @@ var mongojs = require('mongojs');
 var config = require('./../config');
 var jwt    = require('jsonwebtoken');
 //var User = require('./user');
-var bcrypt = require('bcrypt-nodejs');
+var bcrypt = require('bcrypt');
 //var db = mongojs('mongodb://user:password@ds161262.mlab.com:61262/sgrestaurant', ['restaurants']);
 var session = require('express-session');
+const { ReplSet } = require('mongodb');
 var MongoStore = require('connect-mongo')(session)
 var db = mongojs(config.db);
 var schema = mongojs.schema;
-var bcrypt = require('bcrypt-nodejs');
 
 var app = express();
 app.set('superSecret', config.secret);
@@ -46,7 +46,7 @@ app.set('superSecret', config.secret);
                
       } else{
 
-        db.user.insert({username : req.body.username,password : hashpassword}, function(err, data){
+        db.user.insert({username : req.body.username,password : hashpassword, firstname : FirstName, lastname: LastName}, function(err, data){
           if(err){
             console.log(err);
             return res.status(500).send("User Registration Error");

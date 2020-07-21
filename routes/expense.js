@@ -180,7 +180,8 @@ router.post('/postexp/',verifySession, function (req, res, next) {
     // "expamount" : req.body.expamount,
     // "expamount" : parseFloat(expamount),
     "expamount": Number(expamount),
-    "expremark": req.body.expremark
+    "expremark": req.body.expremark,
+    "exppaymentmode" : req.body.exppaymentmode
 
   }, function (err, data) {
     if (err) {

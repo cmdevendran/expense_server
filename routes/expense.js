@@ -3,18 +3,31 @@
 var express = require('express');
 var router = express.Router();
 var mongojs = require('mongojs');
+const { db } = require('./../config');
 var config = require('./../config');
 
+var url = 'mongodb+srv://expense_admin:AVwC7jKLDsiZWVpz@expense-tracker.rjqyt.mongodb.net/expense_tracker?retryWrites=true&w=majority';
 
+var MongoClient = require('mongodb').MongoClient;
+//Connect to db:
 
-var db = mongojs(config.db);
+var dbo;
+MongoClient.connect(url, function(err, db) {
+  if (err) throw err;
+  console.log("Database created!");
+  dbo = db.db("expense_tracker");
+
+ 
+}); 
+
+//var db = mongojs(config.db);
 var ObjectID = mongojs.ObjectID;
 
 // used to get the categories for expense form
 router.post('/getcat/', verifySession, function (req, res, next) {
   console.log("within getcat called");
 
-  db.category.findOne({ "name": "category", "userid":req.headers.session }, { "categories": 1 },
+  dbo.collection('category').findOne({ "name": "category", "userid":req.headers.session }, { "categories": 1 },
     function (err, restaurants) {
       if (err) {
         res.send(err);
@@ -42,8 +55,13 @@ router.post('/getexpenses/', verifySession, function (req, res, next) {
   if(!startDate && !endDate) {
       console.log("No start and end date");
 
-      db.expense_entries.find({'userid':session
-        }).limit(10).sort({expdate:-1} ,
+      dbo.collection('expense_entries').find({'userid':session,
+      'expdate' :{
+        'gte' : (new Date(startDate).toISOString()),
+      
+        '$lte' :  (new Date(endDate).toISOString())
+     }
+        }).limit(10).sort({expdate:-1}).toArray(
         function (err, restaurants) {
           if (err) {
             res.send(err);
@@ -53,11 +71,11 @@ router.post('/getexpenses/', verifySession, function (req, res, next) {
         });
   } else if(!startDate){
     console.log("only start date");
-    db.expense_entries.find({'userid':session, 'expdate' :{
+    dbo.collection('expense_entries').find({'userid':session, 'expdate' :{
       
          '$lte' :  (new Date(endDate).toISOString())
       }
-      }).sort({expdate:-1} ,
+      }).sort({expdate:-1}).toArray(
       function (err, restaurants) {
         if (err) {
           res.send(err);
@@ -67,12 +85,12 @@ router.post('/getexpenses/', verifySession, function (req, res, next) {
       });
 
   }else if(!endDate){
-    console.log("only end date");
-    db.expense_entries.find({'userid':session, 'expdate' :{
+    console.log("only end date" +"session : "+session);
+    dbo.collection('expense_entries').find({'userid':session, 'expdate' :{
       '$gte' : (new Date(startDate).toISOString())
          
       }
-      }).sort({expdate:-1} ,
+      }).sort({expdate:-1}).toArray(
       function (err, restaurants) {
         if (err) {
           res.send(err);
@@ -83,13 +101,18 @@ router.post('/getexpenses/', verifySession, function (req, res, next) {
 
   }else{
     console.log("have both date");
-    db.expense_entries.find({'userid':session, 'expdate' :{
-      '$gte' : (new Date(startDate).toISOString()),
-         '$lte' :  (new Date(endDate).toISOString())
+    console.log("have both date"+startDate);
+    console.log("have both date"+endDate);
+    dbo.collection('expense_entries').find({'userid':session, 'expdate' :{
+       '$gte' : mimicISOString(startDate,"startDate"),
+        '$lte' :  mimicISOString(endDate,"endDate") 
+        
+
       }
-      }).sort({expdate:-1} ,
+      }).sort({expdate:-1}).toArray(
       function (err, restaurants) {
         if (err) {
+          console.log(err)
           res.send(err);
         }
         res.json(restaurants);
@@ -102,6 +125,32 @@ router.post('/getexpenses/', verifySession, function (req, res, next) {
 
 
 });
+
+
+
+
+function mimicISOString(date,value) {
+    let d = new Date(date),
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getDate(),
+        year = d.getFullYear();
+
+    if (month.length < 2) 
+        month = '0' + month;
+    if (day.length < 2) 
+        day = '0' + day;
+
+    if(value=="startDate")
+        return [year, month, day].join('-') +'T00:00:00.000Z';
+    else if(value=="endDate")
+         return [year, month, day].join('-') +'T23:59:00.000Z';
+        
+
+
+}
+
+console.log(mimicISOString(new Date()));
+
 
 function verfiyAuth(req, res, next) {
   console.log("Witin VerifyAuth " + JSON.stringify(req.headers));
@@ -118,7 +167,7 @@ function verifySession(req, res, next) {
   console.log(" req login 1: " + req.headers.session);
   if (req.get('session')) {
     console.log(" req login 2 : " + req.headers.session);
-    db.sessions.findOne({ "session": { $regex: req.headers.session } }, function (err, data) {
+    dbo.collection('sessions').findOne({ "session": { $regex: req.headers.session } }, function (err, data) {
       if (err) {
         console.log("verify session within db.session " + err);
         err.status = 401;
@@ -173,7 +222,7 @@ router.post('/postexp/',verifySession, function (req, res, next) {
 
   var isodate = new Date(expdate).toISOString();
   console.log("iso_expdate : " + isodate)
-  db.expense_entries.insert({
+  dbo.collection('expense_entries').insert({
     "expcat": req.body.expcat,
     "expdate": isodate,
     "userid":req.headers.session ,
@@ -211,7 +260,7 @@ router.post('/postexp/',verifySession, function (req, res, next) {
     var session = req.headers.session;
     console.log("within expenses.." + session)
 
-    db.expense_entries.remove({
+    dbo.collection('expense_entries').remove({
       "_id": mongojs.ObjectId(req.body._id)
     }, function (err, data) {
       if (err) {
@@ -220,7 +269,6 @@ router.post('/postexp/',verifySession, function (req, res, next) {
       res.json(data);
 
     });
-
 
 
 

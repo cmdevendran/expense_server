@@ -33,52 +33,15 @@ morgan.token('date', function() {
 });
 app.use(morgan('combined'));
 
-var db = mongojs(config.db,['expense_tracker']); // connect to database
+
+
 app.set('superSecret', config.secret); // secret variable
-//app.unless(jwt({secret:config.secret}).unless({path:['/api','/']}))  ;
-var sess = {
-  secret:  app.get('superSecret'),
-  resave : false,
-  saveUninitialized: false,
-  cookie: {},
-  store: new MongoStore({ url :  config.db })
-
-}
- 
-if (app.get('env') === 'PROD') {
-  app.set('trust proxy', 1) // trust first proxy
-  sess.cookie.secure = true // serve secure cookies
-
-}
- 
-app.use(session(sess));
-
-
-//app.use(ejwt({ secret: app.get('superSecret')}).unless({path: ['/authenticate/']}));
-// used for JWT token
-app.use("/", ejwt({
-  secret : app.get('superSecret'),
-  getToken: function fromCookie (req) {
-    var token = req.params.get('id')|| req.params.get('ID');
-      console.log("token in server.js : "+token + "super secret"+ app.get('superSecret'));
-    if (token) {
-      return token;
-      console.log("tokessn in server.js : "+token + "super secret"+ app.get('superSecret'));
-    }
-    return null;
-  }
-}).unless({
-    path:[
-  //    '/authenticate/',
-  //    '/'
-
-    ]}
-));
 
 
 app.use(function(err, req, res, next) {
- res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, session, X-Requested-With, Content-Type, Accept, Authorization");
+
+res.header('Access-Control-Allow-Origin', '*');
+res.header("Access-Control-Allow-Headers", "Origin, session, X-Requested-With, Content-Type, Accept, Authorization");
 res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
 
 
@@ -112,16 +75,6 @@ app.use('/expense', expense);
 app.use('/trip', trip);
 app.use('/authenticate',authenticate);
 
-//app.use('/api',router);
-
-
-/*
-var server = require('http').createServer(app);
-var io = require('socket.io')(server);
-io.on('connection', function(){ /* … */ /*});
-server.listen(port, function(){
-    console.log('Server started on port '+port);
-});*/
 
 
 app.listen(app.get('port'),function(){
@@ -129,7 +82,28 @@ app.listen(app.get('port'),function(){
     var isodate = new Date().toISOString();
    // console.log(isodate.toLocaleTimeString());
     console.log('Server started at  '+isodate.replace(/z|t/gi,' ').trim());
-    
+
+
+
+/* const url = 'mongodb+srv://expense_admin:AVwC7jKLDsiZWVpz@expense-tracker.rjqyt.mongodb.net/expense_tracker?retryWrites=true&w=majority';
+
+var MongoClient = require('mongodb').MongoClient;
+//Create a database named "mydb":
+
+
+MongoClient.connect(url, function(err, db) {
+  if (err) throw err;
+  console.log("Database created!");
+  var dbo = db.db("expense_tracker");
+  var query = { tripclient: "MHIAP" };
+  dbo.collection("trips").find(query).toArray(function(err, result) {
+    if (err) throw err;
+    console.log(result);
+    db.close();
+  });
+ 
+});  */
+
 });
 
 module.exports = app;

@@ -21,6 +21,7 @@
     "mongodb": "^2.2.30",
     "mongojs": "^2.4.0",
     "morgan": "^1.8.2",
+    "nodemon": "^2.0.6",
     "socket.io": "^2.0.3"
   }
 }

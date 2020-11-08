@@ -8,14 +8,32 @@ var bcrypt = require('bcrypt');
 //var db = mongojs('mongodb://user:password@ds161262.mlab.com:61262/sgrestaurant', ['restaurants']);
 var session = require('express-session');
 const { ReplSet } = require('mongodb');
-var MongoStore = require('connect-mongo')(session)
-var db = mongojs(config.db);
-var schema = mongojs.schema;
+//var MongoStore = require('connect-mongo')(session)
+
+
+
+
+var url = 'mongodb+srv://expense_admin:AVwC7jKLDsiZWVpz@expense-tracker.rjqyt.mongodb.net/expense_tracker?retryWrites=true&w=majority';
+
+var db = mongojs(url);
+var schema = mongojs.schema; 
+
 
 var app = express();
 app.set('superSecret', config.secret);
 
 
+var MongoClient = require('mongodb').MongoClient;
+//Connect to db:
+
+var dbo;
+MongoClient.connect(config.db, function(err, db) {
+  if (err) throw err;
+  console.log("Database created!");
+  dbo = db.db("expense_tracker");
+
+ 
+}); 
 
 
 
@@ -35,7 +53,7 @@ app.set('superSecret', config.secret);
 
     var hashpassword = bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
 
-    db.user.findOne({username: username}, function(err, user) {
+    dbo.collection('user').findOne({username: username}, function(err, user) {
       if(err){
         console.log(err);
         return res.status(500).send();
@@ -46,7 +64,7 @@ app.set('superSecret', config.secret);
                
       } else{
 
-        db.user.insert({username : req.body.username,password : hashpassword, firstname : FirstName, lastname: LastName}, function(err, data){
+        dbo.collection('user').insert({username : req.body.username,password : hashpassword, firstname : FirstName, lastname: LastName}, function(err, data){
           if(err){
             console.log(err);
             return res.status(500).send("User Registration Error");
@@ -91,7 +109,7 @@ app.set('superSecret', config.secret);
 router.post('/rest/profile', requiresLogin, function(req, res, next) {
   //...
 
-  db.user.findOne({username: 'Deva'},{ password :1}, function(err, user) {
+  dbo.collection('user').findOne({username: 'Deva'},{ password :1}, function(err, user) {
     if(err){
       console.log(err);
       return res.status(500).send();
@@ -122,7 +140,7 @@ router.post('/rest/profile', requiresLogin, function(req, res, next) {
     }
     var hashpassword = bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
     console.log(hashpassword);
-    db.user.findOne({username: username},{ password :1}, function(err, user) {
+    dbo.collection('user').findOne({username: username},{ password :1}, function(err, user) {
       if(err){
         console.log(err);
         return res.status(500).send();
@@ -137,7 +155,7 @@ router.post('/rest/profile', requiresLogin, function(req, res, next) {
           }
           if(data==true){
             //Authenticatio success
-            req.session.userId = user._id;
+            req.session = user._id;
            // return res.redirect('/profile');
 
             console.log("user data : "+ data);

@@ -6,13 +6,12 @@ var mongojs = require('mongojs');
 const { db } = require('./../config');
 var config = require('./../config');
 
-var url = 'mongodb+srv://expense_admin:AVwC7jKLDsiZWVpz@expense-tracker.rjqyt.mongodb.net/expense_tracker?retryWrites=true&w=majority';
 
 var MongoClient = require('mongodb').MongoClient;
 //Connect to db:
 
 var dbo;
-MongoClient.connect(url, function(err, db) {
+MongoClient.connect(config.db, function(err, db) {
   if (err) throw err;
   console.log("Database created!");
   dbo = db.db("expense_tracker");

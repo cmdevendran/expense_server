@@ -39,8 +39,7 @@ app.set('superSecret', config.secret); // secret variable
 
 
 app.use(function(err, req, res, next) {
-
-res.header('Access-Control-Allow-Origin', '*');
+res.header("Access-Control-Allow-Origin", "*");
 res.header("Access-Control-Allow-Headers", "Origin, session, X-Requested-With, Content-Type, Accept, Authorization");
 res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
 
@@ -85,24 +84,7 @@ app.listen(app.get('port'),function(){
 
 
 
-/* const url = 'mongodb+srv://expense_admin:AVwC7jKLDsiZWVpz@expense-tracker.rjqyt.mongodb.net/expense_tracker?retryWrites=true&w=majority';
 
-var MongoClient = require('mongodb').MongoClient;
-//Create a database named "mydb":
-
-
-MongoClient.connect(url, function(err, db) {
-  if (err) throw err;
-  console.log("Database created!");
-  var dbo = db.db("expense_tracker");
-  var query = { tripclient: "MHIAP" };
-  dbo.collection("trips").find(query).toArray(function(err, result) {
-    if (err) throw err;
-    console.log(result);
-    db.close();
-  });
- 
-});  */
 
 });
 

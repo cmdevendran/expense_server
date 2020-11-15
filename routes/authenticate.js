@@ -133,9 +133,7 @@ router.post('/rest/profile', requiresLogin, function(req, res, next) {
     console.log(credentials);
     var username = req.body.username;
     var password = req.body.password;
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header("Access-Control-Allow-Headers", "Origin, session, X-Requested-With, Content-Type, Accept, Authorization");
-
+   
     console.log(username + ' '+ password);
     if(username==null || password==null){
       console.log("username or password null");

@@ -157,6 +157,11 @@ router.post('/rest/profile', requiresLogin, function(req, res, next) {
           if(data==true){
             //Authenticatio success
             req.session = user._id;
+            dbo.collection('sessions').insert({'session' : user._id}, function(err, d1) {
+
+            })
+
+
            // return res.redirect('/profile');
 
             console.log("user data : "+ data);

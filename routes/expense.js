@@ -166,7 +166,7 @@ function verifySession(req, res, next) {
   console.log(" req login 1: " + req.headers.session);
   if (req.get('session')) {
     console.log(" req login 2 : " + req.headers.session);
-    dbo.collection('sessions').findOne({ "session": { $regex: req.headers.session } }, function (err, data) {
+    dbo.collection('sessions').findOne({ "session": mongojs.ObjectId(req.headers.session) }, function (err, data) {
       if (err) {
         console.log("verify session within db.session " + err);
         err.status = 401;

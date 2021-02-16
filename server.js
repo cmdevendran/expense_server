@@ -4,7 +4,9 @@ var config = require('./config'); // get our config file
 var mongojs = require('mongojs');
 var ejwt = require('express-jwt');
 var session = require('express-session');
+var cors = require('cors')
 var MongoStore = require('connect-mongo')(session)
+
 
 
 
@@ -24,6 +26,7 @@ var morgan = require('morgan');
 
 	//Access-Control-Allow-Headers
 //After lots of googling I decided to npm install express and add
+app.use(cors())
 
 app.set('port', (process.env.PORT || 8080));
 

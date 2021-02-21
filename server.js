@@ -42,6 +42,7 @@ app.set('superSecret', config.secret); // secret variable
 
 
 app.use(function(err, req, res, next) {
+res.header('Content-type: application/json');
 res.header("Access-Control-Allow-Origin", "*");
 res.header("Access-Control-Allow-Headers", "Origin, session, X-Requested-With, Content-Type, Accept, Authorization");
 res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");

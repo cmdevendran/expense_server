@@ -28,7 +28,7 @@ client.connect();
 var ObjectID = mongojs.ObjectID;
 
 // used to get the categories for expense form
-router.post('/getcat/',  async function (req, res, next) {
+router.post('/getcat/',verifySession,  async function (req, res, next) {
   var session = req.headers.session;
   console.log("within getcat called" + session);
 
@@ -47,7 +47,7 @@ router.post('/getcat/',  async function (req, res, next) {
 });
 
 // returns the expenses
-router.post('/getexpenses/', verifySession, function (req, res, next) {
+router.post('/getexpenses/', verifySession, async function (req, res, next) {
   console.log("within Expenses called");
   console.log(req.body);
 //  console.log(req.body.credential.startDate);
@@ -63,7 +63,7 @@ router.post('/getexpenses/', verifySession, function (req, res, next) {
   if(!startDate && !endDate) {
       console.log("No start and end date");
 
-      dbo.collection('expense_entries').find({'userid':session,
+      await dbo.collection('expense_entries').find({'userid':session,
       'expdate' :{
         'gte' : (new Date(startDate).toISOString()),
       
@@ -79,7 +79,7 @@ router.post('/getexpenses/', verifySession, function (req, res, next) {
         });
   } else if(!startDate){
     console.log("only start date");
-    dbo.collection('expense_entries').find({'userid':session, 'expdate' :{
+    await dbo.collection('expense_entries').find({'userid':session, 'expdate' :{
       
          '$lte' :  (new Date(endDate).toISOString())
       }
@@ -94,7 +94,7 @@ router.post('/getexpenses/', verifySession, function (req, res, next) {
 
   }else if(!endDate){
     console.log("only end date" +"session : "+session);
-    dbo.collection('expense_entries').find({'userid':session, 'expdate' :{
+    await dbo.collection('expense_entries').find({'userid':session, 'expdate' :{
       '$gte' : (new Date(startDate).toISOString())
          
       }
@@ -111,7 +111,7 @@ router.post('/getexpenses/', verifySession, function (req, res, next) {
     console.log("have both date");
     console.log("have both date"+startDate);
     console.log("have both date"+endDate);
-    dbo.collection('expense_entries').find({'userid':session, 'expdate' :{
+    await dbo.collection('expense_entries').find({'userid':session, 'expdate' :{
        '$gte' : mimicISOString(startDate,"startDate"),
         '$lte' :  mimicISOString(endDate,"endDate") 
         
@@ -224,7 +224,7 @@ function requiresLogin(req, res, next) {
   }
 }
 
-router.post('/postexp/',verifySession, function (req, res, next) {
+router.post('/postexp/',verifySession, async function (req, res, next) {
   const dbo = client.db("expense_tracker");
 
   var expcat = req.body.expcat;
@@ -234,7 +234,7 @@ router.post('/postexp/',verifySession, function (req, res, next) {
 
   var isodate = new Date(expdate).toISOString();
   console.log("iso_expdate : " + isodate)
-  dbo.collection('expense_entries').insert({
+  await dbo.collection('expense_entries').insert({
     "expcat": req.body.expcat,
     "expdate": isodate,
     "userid":req.headers.session ,
@@ -267,14 +267,14 @@ router.post('/postexp/',verifySession, function (req, res, next) {
    
    */
 
-  router.post('/deleteexp/', verifySession, function (req, res, next) {
+  router.post('/deleteexp/', verifySession, async function (req, res, next) {
     const dbo = client.db("expense_tracker");
 
 
     var session = req.headers.session;
     console.log("within expenses.." + session)
 
-    dbo.collection('expense_entries').remove({
+    await dbo.collection('expense_entries').remove({
       "_id": mongojs.ObjectId(req.body._id)
     }, function (err, data) {
       if (err) {

@@ -3,38 +3,46 @@
 var express = require('express');
 var router = express.Router();
 var mongojs = require('mongojs');
+var {MongoClient} = require('mongodb');
+
+var ObjectId = require('mongodb').ObjectId;
 const { db } = require('./../config');
 var config = require('./../config');
 
 
-var MongoClient = require('mongodb').MongoClient;
 //Connect to db:
+const client = new MongoClient(config.db);
+client.connect();
 
-var dbo;
-MongoClient.connect(config.db, function(err, db) {
-  if (err) throw err;
-  console.log("Database created!");
-  dbo = db.db("expense_tracker");
+// var dbo= MongoClient.connect(config.db, function(err, db) {
+//   if (err) throw err;
+//   console.log("Database connected!");
+//   return db.db("expense_tracker");
+
+  
 
  
-}); 
+// }); 
 
 //var db = mongojs(config.db);
 var ObjectID = mongojs.ObjectID;
 
 // used to get the categories for expense form
-router.post('/getcat/', verifySession, function (req, res, next) {
-  console.log("within getcat called");
+router.post('/getcat/',  async function (req, res, next) {
+  var session = req.headers.session;
+  console.log("within getcat called" + session);
 
-  dbo.collection('category').findOne({ "name": "category", "userid":req.headers.session }, { "categories": 1 },
-    function (err, restaurants) {
-      if (err) {
-        res.send(err);
-      }
-      res.json(restaurants);
-      console.log("From get Restaurant menthod : " + restaurants);
-    });
 
+  const dbo = client.db("expense_tracker");
+
+  const coll = await dbo.collection('category').findOne({ "name": "category", "userid":session }, { "categories": 1 });
+  if(coll){
+    res.status(200).send(coll);
+
+  }else{
+    res.status(200).send("Error in getting Collection");
+
+  }
 
 });
 
@@ -48,6 +56,7 @@ router.post('/getexpenses/', verifySession, function (req, res, next) {
   session = req.headers.session;
 
 
+  const dbo = client.db("expense_tracker");
 
   console.log( "in get expenses : "+ startDate +" "+endDate);
 
@@ -161,12 +170,14 @@ function verfiyAuth(req, res, next) {
   }
 }
 // USED to check the session is active or not. if session not available then most of things should not proceed.
-function verifySession(req, res, next) {
+async function verifySession (req, res, next) {
+  const dbo = client.db("expense_tracker");
+
   console.log(JSON.stringify(req.headers));
-  console.log(" req login 1: " + req.headers.session);
+  const session = req.headers.session;
+  console.log(" req login 1: " + session);
   if (req.get('session')) {
-    console.log(" req login 2 : " + req.headers.session);
-    dbo.collection('sessions').findOne({ "session": mongojs.ObjectId(req.headers.session) }, function (err, data) {
+    await dbo.collection('sessions').findOne({ "session": ObjectId(session) }, function (err, data) {
       if (err) {
         console.log("verify session within db.session " + err);
         err.status = 401;
@@ -214,6 +225,8 @@ function requiresLogin(req, res, next) {
 }
 
 router.post('/postexp/',verifySession, function (req, res, next) {
+  const dbo = client.db("expense_tracker");
+
   var expcat = req.body.expcat;
   var expdate = req.body.expdate;
   var expamount = req.body.expamount;
@@ -255,6 +268,8 @@ router.post('/postexp/',verifySession, function (req, res, next) {
    */
 
   router.post('/deleteexp/', verifySession, function (req, res, next) {
+    const dbo = client.db("expense_tracker");
+
 
     var session = req.headers.session;
     console.log("within expenses.." + session)

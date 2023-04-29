@@ -155,15 +155,7 @@ function mimicISOString(date,value) {
 console.log(mimicISOString(new Date()));
 
 
-function verfiyAuth(req, res, next) {
-  console.log("Witin VerifyAuth " + JSON.stringify(req.headers));
-  if (req.get('session')) {
-    // add custom to your request object
-    req._custom = req.get('session');
-    console.log("Auuthorisatoin  header : " + JSON.stringify(req._custom));
-    next();
-  }
-}
+
 // USED to check the session is active or not. if session not available then most of things should not proceed.
 async function verifySession (req, res, next) {
   const dbo = client.db("expense_tracker");
@@ -214,7 +206,7 @@ router.post('/postexp/',verifySession, async function (req, res, next) {
 
   var isodate = new Date(expdate).toISOString();
   console.log("iso_expdate : " + isodate)
-  await dbo.collection('expense_entries').insert({
+  const doc = await dbo.collection('expense_entries').insertOne({
     "expcat": req.body.expcat,
     "expdate": isodate,
     "userid":req.headers.session ,
@@ -224,13 +216,8 @@ router.post('/postexp/',verifySession, async function (req, res, next) {
     "expremark": req.body.expremark,
     "exppaymentmode" : req.body.exppaymentmode
 
-  }, function (err, data) {
-    if (err) {
-      res.send(err);
-    }
-    res.json(data);
-    console.log("From get Restaurant menthod : " + data);
   });
+  res.status(200).send(doc);
 
 
 

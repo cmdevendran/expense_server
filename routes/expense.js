@@ -49,7 +49,7 @@ router.post('/getcat/',verifySession,  async function (req, res, next) {
 // returns the expenses
 router.post('/getexpenses/', verifySession, async function (req, res, next) {
   console.log("within Expenses called");
-  console.log(req.body);
+  //console.log(req.body);
 //  console.log(req.body.credential.startDate);
   startDate = req.body.startDate;
   endDate = req.body.endDate;
@@ -63,69 +63,64 @@ router.post('/getexpenses/', verifySession, async function (req, res, next) {
   if(!startDate && !endDate) {
       console.log("No start and end date");
 
-      await dbo.collection('expense_entries').find({'userid':session,
+      const doccoll =await dbo.collection('expense_entries').find({'userid':session,
       'expdate' :{
         'gte' : (new Date(startDate).toISOString()),
       
         '$lte' :  (new Date(endDate).toISOString())
      }
-        }).limit(10).sort({expdate:-1}).toArray(
-        function (err, restaurants) {
-          if (err) {
-            res.send(err);
-          }
-          res.json(restaurants);
-          console.log("From get Restaurant menthod : " + restaurants);
-        });
+        }).limit(10).sort({expdate:-1}).toArray();
+        return res.status(200).send(doccoll);
+        
   } else if(!startDate){
     console.log("only start date");
-    await dbo.collection('expense_entries').find({'userid':session, 'expdate' :{
+  
+    const doccoll= await dbo.collection('expense_entries').find({'userid':session, 'expdate' :{
       
          '$lte' :  (new Date(endDate).toISOString())
       }
-      }).sort({expdate:-1}).toArray(
-      function (err, restaurants) {
-        if (err) {
-          res.send(err);
-        }
-        res.json(restaurants);
-        console.log("From get Restaurant menthod : " + restaurants);
-      });
-
+      }).sort({expdate:-1}).toArray();
+      if(doccoll){
+        return res.status(200).send(doccoll);
+      }
+      
   }else if(!endDate){
     console.log("only end date" +"session : "+session);
-    await dbo.collection('expense_entries').find({'userid':session, 'expdate' :{
+    const doccoll = await dbo.collection('expense_entries').find({'userid':session, 'expdate' :{
       '$gte' : (new Date(startDate).toISOString())
          
       }
-      }).sort({expdate:-1}).toArray(
-      function (err, restaurants) {
-        if (err) {
-          res.send(err);
-        }
-        res.json(restaurants);
-        console.log("From get Restaurant menthod : " + restaurants);
-      });
+      }).sort({expdate:-1}).toArray();
+      return res.status(200).send(doccoll);
+      
 
   }else{
     console.log("have both date");
     console.log("have both date"+startDate);
     console.log("have both date"+endDate);
-    await dbo.collection('expense_entries').find({'userid':session, 'expdate' :{
-       '$gte' : mimicISOString(startDate,"startDate"),
-        '$lte' :  mimicISOString(endDate,"endDate") 
-        
+    if(dbo){
 
-      }
-      }).sort({expdate:-1}).toArray(
-      function (err, restaurants) {
-        if (err) {
-          console.log(err)
-          res.send(err);
-        }
-        res.json(restaurants);
-        console.log("From get Restaurant menthod : " + restaurants);
-      });
+      const doccoll =  await dbo.collection('expense_entries').find({'userid':session, 'expdate' :{
+        '$gte' : mimicISOString(startDate,"startDate"),
+         '$lte' :  mimicISOString(endDate,"endDate") 
+         
+ 
+       }
+       }).sort({expdate:-1}).toArray();
+       return res.status(200).send(doccoll);
+    }else{
+      throw Error("Issue in getting expenses between date range")
+    }
+   
+      
+      // function (err, restaurants) {
+      //   if (err) {
+      //     console.log(err)
+      //     res.send(err);
+      //   }
+      //   res.json(restaurants);
+      //   console.log("From get Restaurant menthod : " + restaurants);
+      // });
    }
 
 

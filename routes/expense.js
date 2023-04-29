@@ -25,7 +25,7 @@ client.connect();
 // }); 
 
 //var db = mongojs(config.db);
-var ObjectID = mongojs.ObjectID;
+//var ObjectID = mongojs.ObjectID;
 
 // used to get the categories for expense form
 router.post('/getcat/',verifySession,  async function (req, res, next) {
@@ -177,32 +177,17 @@ async function verifySession (req, res, next) {
   const session = req.headers.session;
   console.log(" req login 1: " + session);
   if (req.get('session')) {
-    await dbo.collection('sessions').findOne({ "session": ObjectId(session) }, function (err, data) {
-      if (err) {
-        console.log("verify session within db.session " + err);
-        err.status = 401;
-        return next(err);
-      }
-      if (data == null) {
-        console.log("verify session within db.session " + data);
-        res.status = 401;
-        return next(res);
-      }
-
-
-      console.log("verify session : " + JSON.stringify(data));
+    const result = await dbo.collection('sessions').findOne({ "session": new ObjectId(session) });
+    if(result){
+      console.log("verify session : " + JSON.stringify(result));
       return next();
 
-
-
-    });
+    }else{
+      throw Error("issue in getting session");
+    }}
     //console.log("verify session 2 : "+JSON.stringify(data));
 
-  } else {
-    var err = new Error('You must have session in to view this page.');
-    err.status = 401;
-    return next(err);
-  }
+ 
 }
 
 
@@ -275,7 +260,7 @@ router.post('/postexp/',verifySession, async function (req, res, next) {
     console.log("within expenses.." + session)
 
     await dbo.collection('expense_entries').remove({
-      "_id": mongojs.ObjectId(req.body._id)
+      "_id": new ObjectId(req.body._id)
     }, function (err, data) {
       if (err) {
         res.send(err);

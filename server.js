@@ -5,7 +5,7 @@ var mongojs = require('mongojs');
 var ejwt = require('express-jwt');
 var session = require('express-session');
 var cors = require('cors')
-var MongoStore = require('connect-mongo')(session)
+//var MongoStore = require('connect-mongo')(session)
 
 
 

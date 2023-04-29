@@ -5,10 +5,17 @@ var config = require('./../config');
 var jwt    = require('jsonwebtoken');
 //var User = require('./user');
 var bcrypt = require('bcrypt');
-//var db = mongojs('mongodb://user:password@ds161262.mlab.com:61262/sgrestaurant', ['restaurants']);
+const {MongoClient} = require('mongodb');
 var session = require('express-session');
 const { ReplSet } = require('mongodb');
-//var MongoStore = require('connect-mongo')(session)
+
+
+
+
+
+
+
+
 
 
 
@@ -22,19 +29,33 @@ var schema = mongojs.schema;
 var app = express();
 app.set('superSecret', config.secret);
 
-
-var MongoClient = require('mongodb').MongoClient;
+const client = new MongoClient(url);
+client.connect();
+//const dbo = client.db("expense_tracker");
+//var MongoClient = require('mongodb').MongoClient;
 //Connect to db:
 
-var dbo;
-MongoClient.connect(config.db, function(err, db) {
-  if (err) throw err;
-  console.log("Database created!");
-  dbo = db.db("expense_tracker");
+
+// MongoClient.connect(config.db, function(err, db) {
+//   if (err) throw err;
+//   console.log("Database created!");
+//   dbo = db.db("expense_tracker");
 
  
-}); 
+// }); 
+async function main(){
+  const client = new MongoClient(config.db);
+  try{  
+    await client.connect();
+    const dbo = client.db('expense_tracker');
+    return dbo;
 
+  }catch(error){
+    console.log(error);
+
+  }
+
+}
 
 
   // Register user
@@ -128,7 +149,9 @@ router.post('/rest/profile', requiresLogin, function(req, res, next) {
   
 // Login to Mongodb
 
-  router.post('/rest/login',  function(req, res,next) {
+  router.post('/rest/login',  async function(req, res,next) {
+    await client.connect();
+    const dbo = client.db("expense_tracker");
     var credentials = req.body;
     console.log(credentials);
     var username = req.body.username;
@@ -137,50 +160,31 @@ router.post('/rest/profile', requiresLogin, function(req, res, next) {
     console.log(username + ' '+ password);
     if(username==null || password==null){
       console.log("username or password null");
-      return res.status(500).send();
+      return res.status(500).send("username or password null");
     }
     var hashpassword = bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
     console.log(hashpassword);
-    dbo.collection('user').findOne({username: username},{ password :1}, function(err, user) {
-      if(err){
-        console.log(err);
-        return res.status(500).send();
-      }
-      console.log("before  user : "+JSON.stringify(user));
-      if (user) {
-        console.log("user: "+JSON.stringify(user));
-        console.log("user password : "+JSON.stringify(user.password));
-        bcrypt.compare(password, user.password, function(err, data) {
-          if(err){
-            console.log(err);
-          }
-          if(data==true){
-            //Authenticatio success
-            req.session = user._id;
-            dbo.collection('sessions').insert({'session' : user._id}, function(err, d1) {
+   
+   
+   // const dbo = await main();
+  // await dbservice.connect();
+  const user = await dbo.collection('user').findOne({username:username},{password:1});
+   
+  if(user){
+    const result = await bcrypt.compare(password,user.password);
+    if(result){
+      return res.send(user);
 
-            })
+    }else{
+      return res.send("Password does not match");
 
+    }
+  }else{
+    return res.send("error in user");
 
-           // return res.redirect('/profile');
-
-            console.log("user data : "+ data);
-           // res.json(data);
-           return res.status(200).send(user._id);
-          }
-          console.log(data);
-          return res.status(404).send("password does not match");
-          
-      });
-       
-        //password did not match
-      }
-      else if(user==null){
-        return res.status(404).send("No user found");
-      }
+  }
      // console.log(data);
-     
-    });
+  
   });
   
 

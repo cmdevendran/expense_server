@@ -46,6 +46,24 @@ router.post('/getcat/',verifySession,  async function (req, res, next) {
 
 });
 
+router.get('/getcat/',  async function (req, res, next) {
+  var session = req.headers.session;
+  console.log("within getcat called" + session);
+
+
+  const dbo = client.db("expense_tracker");
+
+  const coll = await dbo.collection('category').findOne({ "name": "category", "userid":session }, { "categories": 1 });
+  if(coll){
+    res.status(200).send(coll);
+
+  }else{
+    res.status(200).send("Error in getting Collection");
+
+  }
+
+});
+
 // returns the expenses
 router.post('/getexpenses/', verifySession, async function (req, res, next) {
   console.log("within Expenses called");
@@ -65,12 +83,89 @@ router.post('/getexpenses/', verifySession, async function (req, res, next) {
 
       const doccoll =await dbo.collection('expense_entries').find({'userid':session,
       'expdate' :{
-        'gte' : (new Date(startDate).toISOString()),
+       // 'gte' : (new Date(startDate).toISOString()),
       
-        '$lte' :  (new Date(endDate).toISOString())
+        '$lte' :  (new Date().toISOString())
      }
         }).limit(10).sort({expdate:-1}).toArray();
         return res.status(200).send(doccoll);
+        
+  } else if(!startDate){
+    console.log("only start date");
+  
+    const doccoll= await dbo.collection('expense_entries').find({'userid':session, 'expdate' :{
+      
+         '$lte' :  (new Date(endDate).toISOString())
+      }
+      }).sort({expdate:-1}).toArray();
+      if(doccoll){
+        return res.status(200).send(doccoll);
+      }
+      
+  }else if(!endDate){
+    console.log("only end date" +"session : "+session);
+    const doccoll = await dbo.collection('expense_entries').find({'userid':session, 'expdate' :{
+      '$gte' : (new Date(startDate).toISOString())
+         
+      }
+      }).sort({expdate:-1}).toArray();
+      return res.status(200).send(doccoll);
+      
+
+  }else{
+    console.log("have both date");
+    console.log("have both date"+startDate);
+    console.log("have both date"+endDate);
+    if(dbo){
+
+      const doccoll =  await dbo.collection('expense_entries').find({'userid':session, 'expdate' :{
+        '$gte' : mimicISOString(startDate,"startDate"),
+         '$lte' :  mimicISOString(endDate,"endDate") 
+         
+ 
+       }
+       }).sort({expdate:-1}).toArray();
+       return res.status(200).send(doccoll);
+    }else{
+      throw Error("Issue in getting expenses between date range")
+    }
+   
+      
+      // function (err, restaurants) {
+      //   if (err) {
+      //     console.log(err)
+      //     res.send(err);
+      //   }
+      //   res.json(restaurants);
+      //   console.log("From get Restaurant menthod : " + restaurants);
+      // });
+   }
+
+
+
+
+
+});
+
+router.get('/getexpenses/', verifySession, async function (req, res, next) {
+  console.log("within Expenses called");
+  //console.log(req.body);
+//  console.log(req.body.credential.startDate);
+  startDate = req.body.startDate;
+  endDate = req.body.endDate;
+  session = req.headers.session;
+
+
+  const dbo = client.db("expense_tracker");
+
+  console.log( "in get expenses : "+ startDate +" "+endDate);
+
+  if(!startDate && !endDate) {
+      console.log("No start and end date");
+
+      const doccoll =await dbo.collection('expense_entries').find({'userid':session
+        }).sort({expdate: -1}).limit(10).toArray();
+      return res.status(200).send(doccoll);
         
   } else if(!startDate){
     console.log("only start date");
@@ -203,10 +298,12 @@ router.post('/postexp/',verifySession, async function (req, res, next) {
   var expdate = req.body.expdate;
   var expamount = req.body.expamount;
   var expremark = req.body.expremark;
+  console.log("date" +expcat +"/n")
 
   var isodate = new Date(expdate).toISOString();
-  console.log("iso_expdate : " + isodate)
-  const doc = await dbo.collection('expense_entries').insertOne({
+  console.log("iso_expdate : " + isodate+expamount+expcat+expdate+expremark)
+
+ /*  const doc = await dbo.collection('expense_entries').insertOne({
     "expcat": req.body.expcat,
     "expdate": isodate,
     "userid":req.headers.session ,
@@ -214,9 +311,9 @@ router.post('/postexp/',verifySession, async function (req, res, next) {
     // "expamount" : parseFloat(expamount),
     "expamount": Number(expamount),
     "expremark": req.body.expremark,
-    "exppaymentmode" : req.body.exppaymentmode
+    //"exppaymentmode" : req.body.exppaymentmode
 
-  });
+  }); */
   res.status(200).send(doc);
 
 

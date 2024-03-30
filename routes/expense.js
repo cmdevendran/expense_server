@@ -161,11 +161,25 @@ router.get('/getexpenses/', verifySession, async function (req, res, next) {
   console.log( "in get expenses : "+ startDate +" "+endDate);
 
   if(!startDate && !endDate) {
-      console.log("No start and end date");
+        console.log("No start and end date");
+      var date = new Date();
+      var firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+      var lastDay = new Date(date.getFullYear(), date.getMonth()+1, 0)
+
+
+      console.log("only current month date" +"session : "+session);
+      const doccoll = await dbo.collection('expense_entries').find({'userid':session, 'expdate' :{
+        '$gte' : (new Date(firstDay).toISOString()),
+        '$lte' :  (new Date(lastDay).toISOString())
+           
+        }
+        }).sort({expdate:-1}).toArray();
+        return res.status(200).send(doccoll);
+/*       // assume it as the current month data
 
       const doccoll =await dbo.collection('expense_entries').find({'userid':session
         }).sort({expdate: -1}).limit(10).toArray();
-      return res.status(200).send(doccoll);
+      return res.status(200).send(doccoll); */
         
   } else if(!startDate){
     console.log("only start date");
@@ -180,6 +194,8 @@ router.get('/getexpenses/', verifySession, async function (req, res, next) {
       }
       
   }else if(!endDate){
+    var firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+
     console.log("only end date" +"session : "+session);
     const doccoll = await dbo.collection('expense_entries').find({'userid':session, 'expdate' :{
       '$gte' : (new Date(startDate).toISOString())
@@ -303,7 +319,7 @@ router.post('/postexp/',verifySession, async function (req, res, next) {
   var isodate = new Date(expdate).toISOString();
   console.log("iso_expdate : " + isodate+expamount+expcat+expdate+expremark)
 
- /*  const doc = await dbo.collection('expense_entries').insertOne({
+   const doc = await dbo.collection('expense_entries').insertOne({
     "expcat": req.body.expcat,
     "expdate": isodate,
     "userid":req.headers.session ,
@@ -313,7 +329,7 @@ router.post('/postexp/',verifySession, async function (req, res, next) {
     "expremark": req.body.expremark,
     //"exppaymentmode" : req.body.exppaymentmode
 
-  }); */
+  }); 
   res.status(200).send(doc);
 
 

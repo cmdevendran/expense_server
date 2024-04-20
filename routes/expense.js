@@ -339,6 +339,37 @@ router.post('/postexp/',verifySession, async function (req, res, next) {
 
 });
 
+//Editing expense
+router.post('/editexp/',verifySession, async function (req, res, next) {
+  console.log("WITHIN EDIT EXP")
+  const dbo = client.db("expense_tracker");
+  var _id = req.body._id;
+  var expcat = req.body.expcat;
+  var expdate = req.body.expdate;
+  var expamount = req.body.expamount;
+  var expremark = req.body.expremark;
+  console.log("date" +expcat +"/n" + _id)
+
+  var isodate = new Date(expdate).toISOString();
+  console.log("iso_expdate : " + isodate+expamount+expcat+expdate+expremark)
+
+   const doc = await dbo.collection('expense_entries').updateOne({"_id":new ObjectId(req.body._id)},
+    {$set:{
+      "expcat": req.body.expcat,
+      "expdate": isodate,
+      "userid":req.headers.session ,
+      "expamount": Number(expamount),
+      "expremark": req.body.expremark}});
+   
+   
+  res.status(200).send(doc);
+
+
+
+
+
+
+});
 
   /***
    * 

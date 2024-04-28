@@ -383,9 +383,9 @@ router.post('/editexp/',verifySession, async function (req, res, next) {
 
 
     var session = req.headers.session;
-    console.log("within expenses.." + session)
+    console.log("within expenses.." + session+"\n"+req.body._id)
 
-    await dbo.collection('expense_entries').remove({
+    await dbo.collection('expense_entries').deleteOne({
       "_id": new ObjectId(req.body._id)
     }, function (err, data) {
       if (err) {

@@ -40,25 +40,30 @@ app.use(morgan('combined'));
 
 app.set('superSecret', config.secret); // secret variable
 
+app.use(function(req, res, next) {
+    // Correct way to set headers: key, then value
+    res.header("Access-Control-Allow-Origin", "http://arul.zapto.org");
+    res.header("Access-Control-Allow-Private-Network", "true");
+    res.header("Access-Control-Allow-Headers", "Origin, session, X-Requested-With, Content-Type, Accept, Authorization");
+    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
 
-app.use(function(err, req, res, next) {
-res.header('Content-type: application/json');
-res.header("Access-Control-Allow-Origin", "*");
-res.header("Access-Control-Allow-Headers", "Origin, session, X-Requested-With, Content-Type, Accept, Authorization");
-res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
-
-
-
-if (err.name === 'UnauthorizedError') {
-  return res.status(403).send({
-    success: false,
-    message: 'No token provided.'
-  });
-}
-
-next();
+    // Handle OPTIONS preflight requests immediately
+    if (req.method === 'OPTIONS') {
+        return res.sendStatus(204);
+    }
+    next();
 });
 
+// 2. Separate Error Handler for Unauthorized access
+app.use(function(err, req, res, next) {
+    if (err.name === 'UnauthorizedError') {
+        return res.status(403).send({
+            success: false,
+            message: 'No token provided.'
+        });
+    }
+    next();
+});
 //View Engine
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');

@@ -28,7 +28,7 @@ var morgan = require('morgan');
 //After lots of googling I decided to npm install express and add
 app.use(cors())
 
-app.set('port', (process.env.PORT || 8080));
+app.set('port', (process.env.PORT || 3000));
 
 morgan.token('date', function() {
     var p = new Date().toString().replace(/[A-Z]{3}\+/,'+').split(/ /);
@@ -85,7 +85,7 @@ app.use('/authenticate',authenticate);
 
 
 
-app.listen(app.get('port'),function(){
+app.listen(app.get('port'),'0.0.0.0', function(){
     console.log('Server started on port '+app.get('port'));
     var isodate = new Date().toISOString();
    // console.log(isodate.toLocaleTimeString());

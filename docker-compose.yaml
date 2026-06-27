@@ -4,6 +4,7 @@ services:
   web:
     build: .
     container_name: expense_APISERVER
+    restart: unless-stopped 
     ports:
       - "3000:3000"
     volumes:
@@ -12,3 +13,16 @@ services:
     environment:
       - NODE_ENV=development
     command: npm run dev
+
+  frontend:
+    build: /home/arul/angular_expense_server
+    container_name: expense_ANGULARSERVER
+    restart: unless-stopped
+    ports:
+      - "4200:4200"
+    volumes:
+      - /home/arul/angular_expense_server:/usr/src/app
+      - /usr/src/app/node_modules
+    environment:
+      - NODE_ENV=development
+    command: npm run start -- --host 0.0.0.0
